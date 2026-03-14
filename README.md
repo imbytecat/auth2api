@@ -1,5 +1,7 @@
 # auth2api
 
+[中文](./README_CN.md)
+
 A lightweight proxy that converts Claude OAuth tokens into an OpenAI-compatible API, allowing you to use Claude models with any OpenAI-compatible client or directly with Claude Code.
 
 ## Features
@@ -180,6 +182,11 @@ A minimal automated smoke test suite is included and uses mocked upstream respon
 ```bash
 npm run test:smoke
 ```
+
+## Inspired by
+
+- [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)
+- [sub2api](https://github.com/Wei-Shaw/sub2api)
 
 ## License
 
