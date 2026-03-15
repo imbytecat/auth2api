@@ -86,7 +86,7 @@ cloaking:
   sensitive-words: []
   cache-user-id: false
 
-debug: false
+debug: "off"            # off | errors | verbose
 ```
 
 Timeouts can also be configured if you run long Claude Code tasks:
@@ -101,6 +101,11 @@ timeouts:
 By default, streaming upstream requests are allowed to run for 10 minutes before auth2api aborts them.
 
 The default request body limit is `200mb`, which is more suitable for large Claude Code contexts than the previous fixed `20mb`.
+
+`debug` now supports three levels:
+- `off`: no extra logs
+- `errors`: log upstream/network failures and upstream error bodies
+- `verbose`: include `errors` logs plus per-request method, path, status, and duration
 
 ## Usage
 

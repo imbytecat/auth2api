@@ -1,7 +1,7 @@
 import { Request, Response as ExpressResponse } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { extractApiKey } from "../api-key";
-import { Config } from "../config";
+import { Config, isDebugLevel } from "../config";
 import { AccountFailureKind, AccountManager } from "../accounts/manager";
 import { applyCloaking } from "./cloaking";
 import { callClaudeAPI } from "./claude-api";
@@ -476,7 +476,9 @@ export function createResponsesHandler(config: Config, manager: AccountManager) 
           upstreamResp = await callClaudeAPI(account.accessToken, claudeBody, stream, config.timeouts);
         } catch (err: any) {
           manager.recordFailure(account.email, "network", err.message);
-          if (config.debug) console.error(`Responses attempt ${attempt + 1} network failure: ${err.message}`);
+          if (isDebugLevel(config.debug, "errors")) {
+            console.error(`Responses attempt ${attempt + 1} network failure: ${err.message}`);
+          }
           if (attempt < MAX_RETRIES - 1) {
             await new Promise((r) => setTimeout(r, (attempt + 1) * 1000));
             continue;
@@ -548,7 +550,7 @@ export function createResponsesHandler(config: Config, manager: AccountManager) 
         }
 
         lastStatus = upstreamResp.status;
-        if (config.debug) {
+        if (isDebugLevel(config.debug, "errors")) {
           const errText = await upstreamResp.text().catch(() => "");
           console.error(`Responses attempt ${attempt + 1} failed (${lastStatus}): ${errText}`);
         }

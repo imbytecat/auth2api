@@ -1,6 +1,6 @@
 import { Request, Response as ExpressResponse } from "express";
 import { extractApiKey } from "../api-key";
-import { Config } from "../config";
+import { Config, isDebugLevel } from "../config";
 import { AccountFailureKind, AccountManager } from "../accounts/manager";
 import { openaiToClaude, claudeToOpenai, resolveModel } from "./translator";
 import { applyCloaking } from "./cloaking";
@@ -62,7 +62,9 @@ export function createChatCompletionsHandler(config: Config, manager: AccountMan
           upstreamResp = await callClaudeAPI(account.accessToken, claudeBody, stream, config.timeouts);
         } catch (err: any) {
           manager.recordFailure(account.email, "network", err.message);
-          if (config.debug) console.error(`Attempt ${attempt + 1} network failure: ${err.message}`);
+          if (isDebugLevel(config.debug, "errors")) {
+            console.error(`Attempt ${attempt + 1} network failure: ${err.message}`);
+          }
           if (attempt < MAX_RETRIES - 1) {
             await new Promise((r) => setTimeout(r, (attempt + 1) * 1000));
             continue;
@@ -91,7 +93,9 @@ export function createChatCompletionsHandler(config: Config, manager: AccountMan
         lastStatus = upstreamResp.status;
         try {
           const errText = await upstreamResp.text();
-          if (config.debug) console.error(`Attempt ${attempt + 1} failed (${lastStatus}): ${errText}`);
+          if (isDebugLevel(config.debug, "errors")) {
+            console.error(`Attempt ${attempt + 1} failed (${lastStatus}): ${errText}`);
+          }
         } catch { /* ignore */ }
 
         if (lastStatus === 401) {

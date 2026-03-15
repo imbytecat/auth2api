@@ -16,6 +16,8 @@ export interface TimeoutConfig {
   "count-tokens-ms": number;
 }
 
+export type DebugMode = "off" | "errors" | "verbose";
+
 export interface Config {
   host: string;
   port: number;
@@ -24,7 +26,7 @@ export interface Config {
   "body-limit": string;
   cloaking: CloakingConfig;
   timeouts: TimeoutConfig;
-  debug: boolean;
+  debug: DebugMode;
 }
 
 const DEFAULT_CONFIG: Config = {
@@ -44,8 +46,20 @@ const DEFAULT_CONFIG: Config = {
     "stream-messages-ms": 600000,
     "count-tokens-ms": 30000,
   },
-  debug: false,
+  debug: "off",
 };
+
+function normalizeDebugMode(value: unknown): DebugMode {
+  if (value === true) return "errors";
+  if (value === false || value == null) return "off";
+  if (value === "off" || value === "errors" || value === "verbose") return value;
+  return "off";
+}
+
+export function isDebugLevel(debug: DebugMode, level: Exclude<DebugMode, "off">): boolean {
+  if (debug === "verbose") return true;
+  return debug === level;
+}
 
 export function resolveAuthDir(dir: string): string {
   if (dir.startsWith("~")) {
@@ -75,6 +89,8 @@ export function loadConfig(configPath?: string): Config {
       timeouts: { ...DEFAULT_CONFIG.timeouts, ...(parsed.timeouts || {}) },
     };
   }
+
+  config.debug = normalizeDebugMode((config as Config & { debug?: unknown }).debug);
 
   // Auto-generate API key if none configured
   if (!config["api-keys"] || config["api-keys"].length === 0) {

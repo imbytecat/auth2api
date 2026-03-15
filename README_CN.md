@@ -86,7 +86,7 @@ cloaking:
   sensitive-words: []
   cache-user-id: false
 
-debug: false
+debug: "off"            # off | errors | verbose
 ```
 
 如果你要跑较长的 Claude Code 任务，也可以单独配置上游超时：
@@ -101,6 +101,11 @@ timeouts:
 默认情况下，流式上游请求会允许持续 10 分钟后才会被 auth2api 主动中断。
 
 默认请求体大小限制现在是 `200mb`，比之前固定的 `20mb` 更适合 Claude Code 的大上下文使用场景。
+
+`debug` 现在支持三级日志：
+- `off`：不输出额外调试日志
+- `errors`：记录上游/网络失败信息和上游错误响应正文
+- `verbose`：在 `errors` 基础上，再输出每个请求的方法、路径、状态码和耗时
 
 ## 使用方法
 

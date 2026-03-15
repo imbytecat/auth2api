@@ -24,4 +24,8 @@ timeouts:
   stream-messages-ms: 600000  # stream /v1/messages timeout, suitable for Claude Code long tasks
   count-tokens-ms: 30000      # /v1/messages/count_tokens timeout
 
-debug: false
+# Debug logging level:
+# off = no extra logs
+# errors = upstream/network failure details
+# verbose = errors + per-request access logs
+debug: "off"

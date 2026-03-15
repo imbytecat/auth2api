@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import express from "express";
-import { Config } from "./config";
+import { Config, isDebugLevel } from "./config";
 import { AccountManager } from "./accounts/manager";
 import { extractApiKey } from "./api-key";
 import { createChatCompletionsHandler } from "./proxy/handler";
@@ -59,6 +59,19 @@ export function createServer(config: Config, manager: AccountManager): express.A
   const app = express();
 
   app.use(express.json({ limit: config["body-limit"] }));
+
+  if (isDebugLevel(config.debug, "verbose")) {
+    app.use((req, res, next) => {
+      const startedAt = Date.now();
+      console.error(`[debug] ${req.method} ${req.originalUrl} started`);
+      res.on("finish", () => {
+        console.error(
+          `[debug] ${req.method} ${req.originalUrl} -> ${res.statusCode} in ${Date.now() - startedAt}ms`
+        );
+      });
+      next();
+    });
+  }
 
   // CORS - restrict to localhost origins only
   const LOCALHOST_RE = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;

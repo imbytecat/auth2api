@@ -21,6 +21,7 @@ function makeConfig(authDir: string): Config {
     port: 0,
     "auth-dir": authDir,
     "api-keys": ["test-key"],
+    "body-limit": "200mb",
     cloaking: {
       mode: "never",
       "strict-mode": false,
@@ -32,7 +33,7 @@ function makeConfig(authDir: string): Config {
       "stream-messages-ms": 600000,
       "count-tokens-ms": 30000,
     },
-    debug: false,
+    debug: "off",
   };
 }
 
